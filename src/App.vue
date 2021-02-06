@@ -4,9 +4,10 @@
 
         <div class="toolbar">
             <button @click="add">添加</button>
+            <button @click="deleteNode">删除</button>
         </div>
 
-        <flow-chart :nodes="nodes" :connections="connections" @addConnection="addConnection" />
+        <flow-chart ref="flowChart" :nodes="nodes" :connections="connections" @addConnection="addConnection" />
     </div>
 </template>
 
@@ -104,6 +105,7 @@ export default {
     methods: {
         addConnection(connection) {
             this.connections.push(connection);
+            this.$refs.flowChart.updateGraph();
         },
         add() {
             this.nodes.push({
@@ -117,6 +119,18 @@ export default {
                 outputPorts: [
                     { id: Date.now() + Math.random() * 1000 }
                 ]
+            });
+            this.$refs.flowChart.updateGraph();
+        },
+        deleteNode() {
+            const { selectedNodeId } = this.$refs.flowChart;
+            if (!selectedNodeId) {
+                return;
+            }
+            this.nodes = this.nodes.filter(item => item.id !== selectedNodeId);
+            this.connections = this.connections.filter(item => item.sourceId !== selectedNodeId && item.targetId !== selectedNodeId);
+            this.$nextTick(() => {
+                this.$refs.flowChart.updateGraph();
             });
         }
     }

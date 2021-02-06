@@ -31,16 +31,9 @@ export default {
             d3Connections: null,
             d3DragConnection: null,
             mousedownEndpoint: null,
-            mouseoverEndpoint: null
+            mouseoverEndpoint: null,
+            selectedNodeId: null
         };
-    },
-    watch: {
-        connections() {
-            this.updateGraph();
-        },
-        nodes() {
-            this.updateGraph();
-        }
     },
     mounted() {
         this.d3Svg = d3.select('#svg');
@@ -77,6 +70,7 @@ export default {
 
             // 节点
             this.d3Nodes = this.d3Nodes.data(this.nodes, d => d.id);
+            this.d3Nodes.exit().remove();
             const newGs = this.d3Nodes.enter().append('g');
 
             newGs
@@ -84,9 +78,16 @@ export default {
                     d3.select(this).select('.node-wrap').classed('active', true);
                     d3.select(this).selectAll('.endpoint').classed('active', true);
                 })
-                .on('mouseout', function () {
-                    d3.select(this).select('.node-wrap').classed('active', false);
-                    d3.select(this).selectAll('.endpoint').classed('active', false);
+                .on('mouseout', function (event, d) {
+                    if (self.selectedNodeId !== d.id) {
+                        d3.select(this).select('.node-wrap').classed('active', false);
+                        d3.select(this).selectAll('.endpoint').classed('active', false);
+                    }
+                })
+                .on('click', function (event, d) {
+                    d3.selectAll('.node-wrap').classed('active', false);
+                    self.selectedNodeId = d.id;
+                    d3.select(this).select('.node-wrap').classed('active', true);
                 })
                 .call(this.gDrag());
 
@@ -125,10 +126,10 @@ export default {
             });
 
             this.d3Nodes = newGs.merge(this.d3Nodes).attr('transform', d => `translate(${d.positionX}, ${d.positionY})`);
-            // this.d3Nodes.exit().remove();
 
             // 连线
             this.d3Connections = this.d3Connections.data(this.connections, d => d.id);
+            this.d3Connections.exit().remove();
             const newConnection = this.d3Connections.enter().append('path');
             this.d3Connections = newConnection.merge(this.d3Connections);
 
@@ -158,8 +159,6 @@ export default {
                     .style('stroke-width', '2')
                     .attr('marker-end', 'url(#markerArrow)'); // 连线箭头
             });
-
-            // this.d3Connections.exit().remove();
         },
         addEndpointEvent(port, endpoint, cx, cy, type) {
             endpoint

@@ -15,6 +15,7 @@ module.exports = {
         'max-len': ['warn', 140],
         'func-names': 'off',
         'arrow-parens': ['error', 'as-needed'],
-        'no-param-reassign': ['warn', { props: false }]
+        'no-param-reassign': ['warn', { props: false }],
+        'consistent-return': 'off'
     }
 };
