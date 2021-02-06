@@ -37,6 +37,9 @@ export default {
     watch: {
         connections() {
             this.updateGraph();
+        },
+        nodes() {
+            this.updateGraph();
         }
     },
     mounted() {

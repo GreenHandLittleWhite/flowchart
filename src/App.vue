@@ -2,6 +2,10 @@
     <div id="app">
         <div class="title">flowchart</div>
 
+        <div class="toolbar">
+            <button @click="add">添加</button>
+        </div>
+
         <flow-chart :nodes="nodes" :connections="connections" @addConnection="addConnection" />
     </div>
 </template>
@@ -100,6 +104,20 @@ export default {
     methods: {
         addConnection(connection) {
             this.connections.push(connection);
+        },
+        add() {
+            this.nodes.push({
+                id: Date.now(),
+                name: Math.random() * 100,
+                positionX: Math.random() * 800,
+                positionY: Math.random() * 500,
+                inputPorts: [
+                    { id: Date.now() + Math.random() * 1000 }
+                ],
+                outputPorts: [
+                    { id: Date.now() + Math.random() * 1000 }
+                ]
+            });
         }
     }
 };
@@ -126,6 +144,10 @@ body {
 .title {
     padding: 40px 0;
     font-size: 30px;
+    text-align: center;
+}
+.toolbar {
+    margin-bottom: 10px;
     text-align: center;
 }
 </style>
