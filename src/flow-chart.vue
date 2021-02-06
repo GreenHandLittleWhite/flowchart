@@ -92,7 +92,7 @@ export default {
                 const sourceY = sourceNode.positionY + 32;
                 const targetX = targetNode.positionX + (180 / (targetNode.outputPorts.length + 1)) * (outputPortIndex + 1);
                 const targetY = targetNode.positionY;
-                const path = `M${sourceX},${sourceY}L${targetX},${targetY}`;
+                const path = self.getBezierPath(sourceX, sourceY, targetX, targetY);
 
                 d3.select(this)
                     .attr('d', path)
@@ -115,6 +115,18 @@ export default {
                 .on('mouseout', () => {
                     endpoint.classed('active', false);
                 });
+        },
+        getBezierPath(sourceX, sourceY, targetX, targetY) {
+            const dx = 10;
+            const dy = 60;
+
+            const cpx1 = sourceX - dx;
+            const cpy1 = sourceY + dy;
+            const cpx2 = targetX + dx;
+            const cpy2 = targetY - dy;
+            const path = `M${sourceX},${sourceY}C${cpx1},${cpy1},${cpx2},${cpy2},${targetX},${targetY}`;
+
+            return path;
         }
     }
 };
