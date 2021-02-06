@@ -24,15 +24,34 @@ export default {
     },
     data() {
         return {
+            d3Svg: null,
+            d3G: null,
             d3Nodes: null,
             d3Connections: null
         };
     },
     mounted() {
+        this.d3Svg = d3.select('#svg');
+        this.d3G = d3.select('#container');
         this.d3Nodes = d3.select('#nodesGroup').selectAll('g');
         this.d3Connections = d3.select('#connectionsGroup').selectAll('g');
 
         this.updateGraph();
+
+        // 缩放 && 移动
+        const zoom = d3
+            .zoom()
+            .scaleExtent([0.5, 3])
+            .on('zoom', event => {
+                this.d3G.attr('transform', `translate(${event.transform.x},${event.transform.y}) scale(${event.transform.k})`);
+            })
+            .on('start', () => {
+                this.d3Svg.style('cursor', 'move');
+            })
+            .on('end', () => {
+                this.d3Svg.style('cursor', 'auto');
+            });
+        this.d3Svg.call(zoom).on('dblclick.zoom', null);
     },
     methods: {
         updateGraph() {
