@@ -76,7 +76,16 @@ export default {
             this.d3Nodes = this.d3Nodes.data(this.nodes, d => d.id);
             const newGs = this.d3Nodes.enter().append('g');
 
-            newGs.call(this.gDrag());
+            newGs
+                .on('mouseover', function () {
+                    d3.select(this).select('.node-wrap').classed('active', true);
+                    d3.select(this).selectAll('.endpoint').classed('active', true);
+                })
+                .on('mouseout', function () {
+                    d3.select(this).select('.node-wrap').classed('active', false);
+                    d3.select(this).selectAll('.endpoint').classed('active', false);
+                })
+                .call(this.gDrag());
 
             newGs.append('rect').attr('class', 'node-wrap').attr('rx', 4).attr('ry', 4);
 
@@ -226,12 +235,13 @@ export default {
                     const sourceY = d.positionY + cy;
                     // 获取移动和缩放后的坐标
                     const transform = d3.zoomTransform(this.d3G.node());
-                    // const targetXY = transform.invert(d3.mouse(this.d3Svg.node()));
                     const targetXY = transform.invert(d3.pointer(event, this.d3Svg.node()));
 
                     const bezierPath = this.getBezierPath(sourceX, sourceY, targetXY[0], targetXY[1]);
 
                     this.d3DragConnection.attr('d', bezierPath);
+
+                    d3.selectAll('.endpoint').classed('active', true);
                 })
                 .on('end', () => {
                     if (this.mousedownEndpoint && this.mouseoverEndpoint) {
@@ -248,6 +258,7 @@ export default {
                     }
 
                     this.d3DragConnection.attr('d', null);
+                    d3.selectAll('.endpoint').classed('active', false);
                 });
         }
     }
@@ -281,7 +292,7 @@ export default {
     fill: white;
     stroke: @primary-color;
     stroke-width: 1px;
-    opacity: 0.5;
+    opacity: 0;
     cursor: crosshair;
 
     &.active {
