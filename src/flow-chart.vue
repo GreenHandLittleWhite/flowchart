@@ -117,8 +117,22 @@ export default {
                 });
         },
         getBezierPath(sourceX, sourceY, targetX, targetY) {
-            const dx = 10;
-            const dy = 60;
+            const absX = Math.abs(targetX - sourceX);
+            let dx = parseInt(absX / 100, 10);
+            if (dx > 10) {
+                dx = 10;
+            }
+            if (targetX < sourceX) {
+                dx = -dx;
+            }
+            const absY = Math.abs(targetY - sourceY);
+            let dy = parseInt(absY / 3, 10);
+            if (dy < 60) {
+                dy = 60;
+            }
+            if (dy > 150) {
+                dy = 150;
+            }
 
             const cpx1 = sourceX - dx;
             const cpy1 = sourceY + dy;
