@@ -144,7 +144,8 @@ export default {
             const cpy1 = sourceY + dy;
             const cpx2 = targetX + dx;
             const cpy2 = targetY - dy;
-            const path = `M${sourceX},${sourceY}C${cpx1},${cpy1},${cpx2},${cpy2},${targetX},${targetY - 10}`;
+            let path = `M${sourceX},${sourceY}C${cpx1},${cpy1},${cpx2},${cpy2},${targetX},${targetY - 11}`;
+            path = `${path}L${targetX},${targetY - 11}L${targetX},${targetY - 10}`;
 
             return path;
         }
