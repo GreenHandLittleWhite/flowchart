@@ -284,6 +284,11 @@ export default {
     fill: white;
     stroke: #e0e3e7;
     stroke-width: 1px;
+
+    &.active {
+        fill: fade(@primary-color, 5%);
+        stroke: @primary-color;
+    }
 }
 .node-text {
     font-size: 12px;
