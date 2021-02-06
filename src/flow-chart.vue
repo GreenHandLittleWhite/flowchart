@@ -1,6 +1,11 @@
 <template>
     <div class="chart-container">
         <svg id="svg">
+            <defs>
+                <marker id="markerArrow" markerWidth="5" markerHeight="4" refX="0" refY="2" orient="auto">
+                    <path d="M 0,0 L 5,2 L 0,4 Z" style="fill: red" />
+                </marker>
+            </defs>
             <g id="container">
                 <g id="connectionsGroup"></g>
                 <g id="nodesGroup"></g>
@@ -98,7 +103,8 @@ export default {
                     .attr('d', path)
                     .style('fill', 'none')
                     .style('stroke', 'red')
-                    .style('stroke-width', '2');
+                    .style('stroke-width', '2')
+                    .attr('marker-end', 'url(#markerArrow)'); // 连线箭头
             });
 
             this.d3Connections.exit().remove();
@@ -138,7 +144,7 @@ export default {
             const cpy1 = sourceY + dy;
             const cpx2 = targetX + dx;
             const cpy2 = targetY - dy;
-            const path = `M${sourceX},${sourceY}C${cpx1},${cpy1},${cpx2},${cpy2},${targetX},${targetY}`;
+            const path = `M${sourceX},${sourceY}C${cpx1},${cpy1},${cpx2},${cpy2},${targetX},${targetY - 10}`;
 
             return path;
         }
