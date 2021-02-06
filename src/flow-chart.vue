@@ -28,6 +28,8 @@ export default {
     },
     methods: {
         updateGraph() {
+            const self = this;
+
             // 节点
             this.d3Nodes = this.d3Nodes.data(this.nodes, d => d.id);
             const newGs = this.d3Nodes.enter().append('g');
@@ -52,13 +54,41 @@ export default {
                             textLength = nodeText.node().getComputedTextLength();
                         }
                     });
+
+                d.inputPorts.forEach((port, index) => {
+                    const cx = (180 / (d.inputPorts.length + 1)) * (index + 1);
+                    const cy = 0;
+                    const endpoint = d3.select(this).append('circle');
+                    self.addEndpointEvent(endpoint, cx, cy, 'inputPort');
+                });
+                d.outputPorts.forEach((port, index) => {
+                    const cx = (180 / (d.outputPorts.length + 1)) * (index + 1);
+                    const cy = 32;
+                    const endpoint = d3.select(this).append('circle');
+                    self.addEndpointEvent(endpoint, cx, cy, 'outputPort');
+                });
             });
+        },
+        addEndpointEvent(endpoint, cx, cy) {
+            endpoint
+                .attr('cx', cx)
+                .attr('cy', cy)
+                .attr('r', 7)
+                .attr('class', 'endpoint')
+                .on('mouseover', () => {
+                    endpoint.classed('active', true);
+                })
+                .on('mouseout', () => {
+                    endpoint.classed('active', false);
+                });
         }
     }
 };
 </script>
 
 <style lang="less">
+@primary-color: #409eff;
+
 .chart-container {
     width: 800px;
     height: 500px;
@@ -78,5 +108,22 @@ export default {
 }
 .node-text {
     font-size: 12px;
+}
+.endpoint {
+    fill: white;
+    stroke: @primary-color;
+    stroke-width: 1px;
+    opacity: 0.5;
+    cursor: crosshair;
+
+    &.active {
+        stroke: @primary-color;
+        opacity: 1;
+    }
+    &:hover {
+        fill: @primary-color;
+        stroke: fade(@primary-color, 40%);
+        stroke-width: 7px;
+    }
 }
 </style>

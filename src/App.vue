@@ -21,31 +21,62 @@ export default {
                     id: 1,
                     name: 'AAAAAAAAAAAAAAAAAAAAA',
                     positionX: 50,
-                    positionY: 100
+                    positionY: 100,
+                    inputPorts: [
+                        { id: 1 }
+                    ],
+                    outputPorts: [
+                        { id: 2 },
+                        { id: 3 }
+                    ]
                 },
                 {
                     id: 2,
                     name: 'BBB',
                     positionX: 550,
-                    positionY: 100
+                    positionY: 100,
+                    inputPorts: [
+                        { id: 4 }
+                    ],
+                    outputPorts: [
+                        { id: 5 }
+                    ]
                 },
                 {
                     id: 3,
                     name: 'CCC',
                     positionX: 50,
-                    positionY: 300
+                    positionY: 300,
+                    inputPorts: [
+                        { id: 6 }
+                    ],
+                    outputPorts: [
+                        { id: 7 }
+                    ]
                 },
                 {
                     id: 4,
                     name: 'DDD',
                     positionX: 550,
-                    positionY: 300
+                    positionY: 300,
+                    inputPorts: [
+                        { id: 8 }
+                    ],
+                    outputPorts: [
+                        { id: 9 }
+                    ]
                 },
                 {
                     id: 5,
                     name: 'EEE',
                     positionX: 300,
-                    positionY: 200
+                    positionY: 200,
+                    inputPorts: [
+                        { id: 10 }
+                    ],
+                    outputPorts: [
+                        { id: 11 }
+                    ]
                 }
             ]
         };
