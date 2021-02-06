@@ -2,7 +2,7 @@
     <div id="app">
         <div class="title">flowchart</div>
 
-        <flow-chart :nodes="nodes" :connections="connections" />
+        <flow-chart :nodes="nodes" :connections="connections" @addConnection="addConnection" />
     </div>
 </template>
 
@@ -96,6 +96,11 @@ export default {
                 }
             ]
         };
+    },
+    methods: {
+        addConnection(connection) {
+            this.connections.push(connection);
+        }
     }
 };
 </script>

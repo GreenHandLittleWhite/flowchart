@@ -9,6 +9,7 @@
             <g id="container">
                 <g id="connectionsGroup"></g>
                 <g id="nodesGroup"></g>
+                <path id="dragConnection"></path>
             </g>
         </svg>
     </div>
@@ -27,14 +28,28 @@ export default {
             d3Svg: null,
             d3G: null,
             d3Nodes: null,
-            d3Connections: null
+            d3Connections: null,
+            d3DragConnection: null,
+            mousedownEndpoint: null,
+            mouseoverEndpoint: null
         };
+    },
+    watch: {
+        connections() {
+            this.updateGraph();
+        }
     },
     mounted() {
         this.d3Svg = d3.select('#svg');
         this.d3G = d3.select('#container');
         this.d3Nodes = d3.select('#nodesGroup').selectAll('g');
         this.d3Connections = d3.select('#connectionsGroup').selectAll('g');
+        this.d3DragConnection = d3
+            .select('#dragConnection')
+            .style('fill', 'none')
+            .style('stroke', 'skyblue')
+            .style('stroke-width', '2')
+            .attr('marker-end', 'url(#markerArrow)');
 
         this.updateGraph();
 
@@ -87,17 +102,18 @@ export default {
                     const cx = (180 / (d.inputPorts.length + 1)) * (index + 1);
                     const cy = 0;
                     const endpoint = d3.select(this).append('circle');
-                    self.addEndpointEvent(endpoint, cx, cy, 'inputPort');
+                    self.addEndpointEvent(port, endpoint, cx, cy, 'inputPort');
                 });
                 d.outputPorts.forEach((port, index) => {
                     const cx = (180 / (d.outputPorts.length + 1)) * (index + 1);
                     const cy = 32;
                     const endpoint = d3.select(this).append('circle');
-                    self.addEndpointEvent(endpoint, cx, cy, 'outputPort');
+                    self.addEndpointEvent(port, endpoint, cx, cy, 'outputPort');
                 });
             });
 
             this.d3Nodes = newGs.merge(this.d3Nodes).attr('transform', d => `translate(${d.positionX}, ${d.positionY})`);
+            // this.d3Nodes.exit().remove();
 
             // 连线
             this.d3Connections = this.d3Connections.data(this.connections, d => d.id);
@@ -119,7 +135,7 @@ export default {
 
                 const sourceX = sourceNode.positionX + (180 / (sourceNode.outputPorts.length + 1)) * (inputPortIndex + 1);
                 const sourceY = sourceNode.positionY + 32;
-                const targetX = targetNode.positionX + (180 / (targetNode.outputPorts.length + 1)) * (outputPortIndex + 1);
+                const targetX = targetNode.positionX + (180 / (targetNode.inputPorts.length + 1)) * (outputPortIndex + 1);
                 const targetY = targetNode.positionY;
                 const path = self.getBezierPath(sourceX, sourceY, targetX, targetY);
 
@@ -130,19 +146,37 @@ export default {
                     .style('stroke-width', '2')
                     .attr('marker-end', 'url(#markerArrow)'); // 连线箭头
             });
+
+            // this.d3Connections.exit().remove();
         },
-        addEndpointEvent(endpoint, cx, cy) {
+        addEndpointEvent(port, endpoint, cx, cy, type) {
             endpoint
                 .attr('cx', cx)
                 .attr('cy', cy)
                 .attr('r', 7)
                 .attr('class', 'endpoint')
-                .on('mouseover', () => {
+                .on('mousedown', (event, d) => {
+                    event.stopPropagation();
+                    if (type === 'outputPort') {
+                        this.mousedownEndpoint = {
+                            ...port,
+                            nodeId: d.id
+                        };
+                    }
+                })
+                .on('mouseover', (event, d) => {
                     endpoint.classed('active', true);
+
+                    this.mouseoverEndpoint = {
+                        ...port,
+                        nodeId: d.id
+                    };
                 })
                 .on('mouseout', () => {
                     endpoint.classed('active', false);
-                });
+                    this.mouseoverEndpoint = null;
+                })
+                .call(this.endpointDrag(cx, cy, type));
         },
         getBezierPath(sourceX, sourceY, targetX, targetY) {
             const absX = Math.abs(targetX - sourceX);
@@ -178,6 +212,42 @@ export default {
                     d.positionX += event.dx;
                     d.positionY += event.dy;
                     this.updateGraph();
+                });
+        },
+        endpointDrag(cx, cy, type) {
+            return d3
+                .drag()
+                .on('drag', (event, d) => {
+                    if (type === 'inputPort') {
+                        return;
+                    }
+
+                    const sourceX = d.positionX + cx;
+                    const sourceY = d.positionY + cy;
+                    // 获取移动和缩放后的坐标
+                    const transform = d3.zoomTransform(this.d3G.node());
+                    // const targetXY = transform.invert(d3.mouse(this.d3Svg.node()));
+                    const targetXY = transform.invert(d3.pointer(event, this.d3Svg.node()));
+
+                    const bezierPath = this.getBezierPath(sourceX, sourceY, targetXY[0], targetXY[1]);
+
+                    this.d3DragConnection.attr('d', bezierPath);
+                })
+                .on('end', () => {
+                    if (this.mousedownEndpoint && this.mouseoverEndpoint) {
+                        const newConnection = {
+                            id: Date.now(),
+                            sourceId: this.mousedownEndpoint.nodeId,
+                            targetId: this.mouseoverEndpoint.nodeId,
+                            inputPortId: this.mousedownEndpoint.id,
+                            outputPortId: this.mouseoverEndpoint.id
+                        };
+                        this.$emit('addConnection', newConnection);
+
+                        this.mousedownEndpoint = null;
+                    }
+
+                    this.d3DragConnection.attr('d', null);
                 });
         }
     }
