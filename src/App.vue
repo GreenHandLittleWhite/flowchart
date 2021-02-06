@@ -1,10 +1,17 @@
 <template>
-    <div id="app"></div>
+    <div id="app">
+        <flow-chart />
+    </div>
 </template>
 
 <script>
+import flowChart from './flow-chart.vue';
+
 export default {
-    name: 'App'
+    name: 'App',
+    components: {
+        flowChart
+    }
 };
 </script>
 
