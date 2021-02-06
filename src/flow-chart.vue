@@ -14,15 +14,18 @@ import * as d3 from 'd3';
 
 export default {
     props: {
-        nodes: { type: Array, default: () => [] }
+        nodes: { type: Array, default: () => [] },
+        connections: { type: Array, default: () => [] }
     },
     data() {
         return {
-            d3Nodes: null
+            d3Nodes: null,
+            d3Connections: null
         };
     },
     mounted() {
         this.d3Nodes = d3.select('#nodesGroup').selectAll('g');
+        this.d3Connections = d3.select('#connectionsGroup').selectAll('g');
 
         this.updateGraph();
     },
@@ -68,6 +71,37 @@ export default {
                     self.addEndpointEvent(endpoint, cx, cy, 'outputPort');
                 });
             });
+
+            // 连线
+            this.d3Connections = this.d3Connections.data(this.connections, d => d.id).enter().append('path');
+
+            this.d3Connections.each(function (d) {
+                const sourceNode = self.nodes.find(node => node.id === d.sourceId);
+                const targetNode = self.nodes.find(node => node.id === d.targetId);
+                if (!sourceNode || !targetNode) {
+                    return;
+                }
+
+                const inputPortIndex = sourceNode.outputPorts.findIndex(port => port.id === d.inputPortId);
+                const outputPortIndex = targetNode.inputPorts.findIndex(port => port.id === d.outputPortId);
+                if (inputPortIndex < 0 || outputPortIndex < 0) {
+                    return;
+                }
+
+                const sourceX = sourceNode.positionX + (180 / (sourceNode.outputPorts.length + 1)) * (inputPortIndex + 1);
+                const sourceY = sourceNode.positionY + 32;
+                const targetX = targetNode.positionX + (180 / (targetNode.outputPorts.length + 1)) * (outputPortIndex + 1);
+                const targetY = targetNode.positionY;
+                const path = `M${sourceX},${sourceY}L${targetX},${targetY}`;
+
+                d3.select(this)
+                    .attr('d', path)
+                    .style('fill', 'none')
+                    .style('stroke', 'red')
+                    .style('stroke-width', '2');
+            });
+
+            this.d3Connections.exit().remove();
         },
         addEndpointEvent(endpoint, cx, cy) {
             endpoint

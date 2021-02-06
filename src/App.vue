@@ -2,7 +2,7 @@
     <div id="app">
         <div class="title">flowchart</div>
 
-        <flow-chart :nodes="nodes" />
+        <flow-chart :nodes="nodes" :connections="connections" />
     </div>
 </template>
 
@@ -77,6 +77,22 @@ export default {
                     outputPorts: [
                         { id: 11 }
                     ]
+                }
+            ],
+            connections: [
+                {
+                    id: 1,
+                    sourceId: 1,
+                    targetId: 5,
+                    inputPortId: 3,
+                    outputPortId: 10
+                },
+                {
+                    id: 2,
+                    sourceId: 2,
+                    targetId: 4,
+                    inputPortId: 5,
+                    outputPortId: 8
                 }
             ]
         };
