@@ -14,6 +14,7 @@ module.exports = {
         'comma-dangle': ['warn', 'never'],
         'max-len': ['warn', 140],
         'func-names': 'off',
-        'arrow-parens': ['error', 'as-needed']
+        'arrow-parens': ['error', 'as-needed'],
+        'no-param-reassign': ['warn', { props: false }]
     }
 };

@@ -61,11 +61,12 @@ export default {
             this.d3Nodes = this.d3Nodes.data(this.nodes, d => d.id);
             const newGs = this.d3Nodes.enter().append('g');
 
+            newGs.call(this.gDrag());
+
             newGs.append('rect').attr('class', 'node-wrap').attr('rx', 4).attr('ry', 4);
 
             newGs.each(function (d) {
                 d3.select(this)
-                    .attr('transform', () => `translate(${d.positionX}, ${d.positionY})`)
                     .append('text')
                     .attr('x', 24)
                     .attr('y', 20)
@@ -96,8 +97,12 @@ export default {
                 });
             });
 
+            this.d3Nodes = newGs.merge(this.d3Nodes).attr('transform', d => `translate(${d.positionX}, ${d.positionY})`);
+
             // 连线
-            this.d3Connections = this.d3Connections.data(this.connections, d => d.id).enter().append('path');
+            this.d3Connections = this.d3Connections.data(this.connections, d => d.id);
+            const newConnection = this.d3Connections.enter().append('path');
+            this.d3Connections = newConnection.merge(this.d3Connections);
 
             this.d3Connections.each(function (d) {
                 const sourceNode = self.nodes.find(node => node.id === d.sourceId);
@@ -125,8 +130,6 @@ export default {
                     .style('stroke-width', '2')
                     .attr('marker-end', 'url(#markerArrow)'); // 连线箭头
             });
-
-            this.d3Connections.exit().remove();
         },
         addEndpointEvent(endpoint, cx, cy) {
             endpoint
@@ -167,6 +170,15 @@ export default {
             path = `${path}L${targetX},${targetY - 11}L${targetX},${targetY - 10}`;
 
             return path;
+        },
+        gDrag() {
+            return d3
+                .drag()
+                .on('drag', (event, d) => {
+                    d.positionX += event.dx;
+                    d.positionY += event.dy;
+                    this.updateGraph();
+                });
         }
     }
 };
