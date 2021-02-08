@@ -1,24 +1,7 @@
 # flowchart
 
-## Project setup
-```
-npm install
-```
+# picture
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+![image](https://github.com/GreenHandLittleWhite/flowchart/blob/main/GIF.gif)
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+[Vue + d3 流程图](https://github.com/GreenHandLittleWhite/blog/issues/14)
